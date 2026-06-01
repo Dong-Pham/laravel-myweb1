@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.home');
+
+Route::get('/test1',[ProductController::class,'test1']);
+Route::get('/test2',[ProductController::class,'test2']);
+
 Route::get('/demo',[DemoController::class,'index']);
 Route::get('/demo2',[DemoController::class,'index2']);
 Route::get('/demo3',[DemoController::class,'index3']);
