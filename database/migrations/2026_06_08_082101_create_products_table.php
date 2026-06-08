@@ -1,0 +1,52 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::dropIfExists('products'); // Xóa bảng products nếu đã tồn tại để tránh lỗi khi chạy lại migration
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('productname', 150);
+            $table->string('slug', 200)->unique();
+            // Giá - giá bán
+            $table->decimal('price', 12, 2)->default(0);
+            // Giá - giá sau khi được giảm
+            $table->decimal('pricediscount', 12, 2)->default(0);
+            $table->string('image')->nullable();
+            $table->text('description')->nullable();
+            $table->tinyInteger('status')->default(1);
+            $table->timestamps();
+            // =========
+            // Khóa ngoại với bảng brands
+            $table->unsignedInteger('brand_id')->nullable();
+            $table->foreign('brand_id')
+                ->references('brand_id')
+                ->on('brands')
+                ->nullOnDelete();
+
+
+            // Khóa ngoại với bảng categories
+            $table->unsignedInteger('cateid');
+            $table->foreign('cateid')
+                ->references('cateid')
+                ->on('categories')
+                ->restrictOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};
