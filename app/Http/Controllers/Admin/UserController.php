@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -12,9 +13,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        return "Danh sách người dùng";
+        $list = DB::table('users')
+            ->select('user_id', 'username', 'email', 'phone', 'role', 'status')
+            ->where('status', 1)
+            ->orderBy('username')
+            ->get();
+        return view('admin.users.index', compact('list'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -60,6 +65,6 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        return "Xóa người dùng có id: " . $id;
+        return redirect()->route('admin.users.index')->with('success', 'Xóa người dùng thành công!');
     }
 }

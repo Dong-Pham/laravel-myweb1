@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -12,7 +13,13 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return "Danh sách danh mục";
+        $list = DB::table('categories')
+            ->select('cateid', 'catename', 'slug', 'image', 'status')
+            ->where('status', 1)
+            ->orderBy('catename')
+            ->get();
+
+        return view('admin.categories.index', compact('list'));
     }
 
     /**
@@ -20,7 +27,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return "Tạo danh mục mới";
+        return view('admin.categories.create');
     }
 
     /**
@@ -28,7 +35,11 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        return "Lưu danh mục mới";
+        DB::table('categories')->insert([
+            'catename' => $request->catename,
+            'slug' => $request->slug,
+        ]);
+        return redirect()->route('admin.categories.index');
     }
 
     /**
@@ -44,7 +55,8 @@ class CategoryController extends Controller
      */
     public function edit(string $id)
     {
-        return "Chỉnh sửa danh mục có id: " . $id;
+        $category = DB::table('categories')->where('cateid', $id)->first();
+        return view('admin.categories.edit', compact('category'));
     }
 
     /**
@@ -52,7 +64,13 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        return "Cập nhật danh mục có id: " . $id;
+        DB::table('categories')
+            ->where('cateid', $id)
+            ->update([
+                'catename' => $request->catename,
+                'slug' => $request->slug,
+            ]);
+        return redirect()->route('admin.categories.index');
     }
 
     /**
@@ -60,6 +78,7 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        return "Xóa danh mục có id: " . $id;
+        DB::table('categories')->where('cateid', $id)->delete();
+        return redirect()->route('admin.categories.index');
     }
 }

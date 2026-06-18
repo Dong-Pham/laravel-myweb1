@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -12,7 +13,22 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return "Danh sách sản phẩm";
+        $list = DB::table('products')
+            ->join('categories', 'products.cateid', '=', 'categories.cateid')
+            ->leftJoin('brands', 'products.brand_id', '=', 'brands.brand_id')
+            ->select(
+                'products.id',
+                'products.productname',
+                'products.price',
+                'products.pricediscount',
+                'products.image',
+                'products.status',
+                'categories.catename',
+                'brands.brandname'
+            )
+            ->orderBy('products.productname')
+            ->get();
+        return view('admin.products.index', ['list' => $list]);
     }
 
     /**
@@ -60,7 +76,7 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        return "Xóa sản phẩm có id: " . $id;
+        return redirect()->route('admin.products.index')->with('success', 'Xóa sản phẩm thành công!');
     }
 
     public function test1()

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BrandController extends Controller
 {
@@ -12,7 +13,12 @@ class BrandController extends Controller
      */
     public function index()
     {
-        return "Danh sách thương hiệu";
+        $list = DB::table('brands')
+            ->select('brand_id', 'brandname', 'slug', 'image', 'status')
+            ->where('status', 1)
+            ->orderBy('brandname')
+            ->get();
+        return view('admin.brands.index', compact('list'));
     }
 
     /**
@@ -60,6 +66,6 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-        return "Xóa thương hiệu có id: " . $id;
+        return redirect()->route('admin.brands.index')->with('success', 'Xóa thương hiệu thành công!');
     }
 }
