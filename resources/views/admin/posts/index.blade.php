@@ -21,13 +21,13 @@
                 <th>Nội dung</th>
                 <th>Người viết</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($list as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
                         <img src="{{ asset('storage/images/posts/' . ($item->image ?: 'default.png')) }}"
                             alt="{{ $item->title }}" style="width: 50px; height: 50px; object-fit: cover;">
@@ -35,7 +35,7 @@
                     <td>{{ $item->slug }}</td>
                     <td>{{ $item->title }}</td>
                     <td>{{ Str::limit($item->content, 100) }}</td>
-                    <td>{{ $item->fullname }}</td>
+                    <td>{{ $item->user->fullname }}</td>
                     <td>
                         @if ($item->status == 1)
                             <span class="badge bg-success">Hiển thị</span>
@@ -44,18 +44,17 @@
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('admin.posts.destroy', $item->post_id) }}" method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này?')">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                Xóa
-                            </button>
-                        </form>
+                        <a href="{{ route('admin.posts.destroy', $item->post_id) }}"class="btn btn-danger btn-sm"
+                            onclick="return confirm('Bạn có chắc muốn xóa?')">
+                            <i class = "bi bi-trash"></i>
+                        </a>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    {{-- Hiển thị phân trang --}}
+    <div class="d-flex justify-content-center">
+        {{ $list->links() }}
+    </div>
 @endsection

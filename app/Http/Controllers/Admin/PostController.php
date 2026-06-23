@@ -5,28 +5,47 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Post;
 
 class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($limit = 10)
     {
-        $list = DB::table('posts')
-            ->join('users', 'posts.user_id', '=', 'users.user_id')
+        // Query Builder
+        // $list = DB::table('posts')
+        //     ->join('users', 'posts.user_id', '=', 'users.user_id')
+        //     ->select(
+        //         'posts.post_id',
+        //         'posts.title',
+        //         'posts.slug',
+        //         'posts.image',
+        //         'posts.content',
+        //         'posts.status',
+        //         'users.fullname'
+        //     )
+        //     ->orderBy('posts.title')
+        //     ->get();
+        // return view('admin.posts.index', ['list' => $list]);
+
+        // ==== ORM Eloquent ====
+        $list = Post::with([
+            'user:user_id,fullname'
+        ])
             ->select(
-                'posts.post_id',
-                'posts.title',
-                'posts.slug',
-                'posts.image',
-                'posts.content',
-                'posts.status',
-                'users.fullname'
+                'post_id',
+                'title',
+                'slug',
+                'image',
+                'content',
+                'status',
+                'user_id'
             )
-            ->orderBy('posts.title')
-            ->get();
-        return view('admin.posts.index', ['list' => $list]);
+            ->orderBy('title')
+            ->paginate($limit);
+        return view('admin.posts.index', compact('list'));
     }
 
     /**

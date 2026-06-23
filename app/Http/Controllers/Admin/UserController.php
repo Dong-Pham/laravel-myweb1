@@ -5,19 +5,26 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($limit = 10)
     {
-        $list = DB::table('users')
-            ->select('user_id', 'username', 'email', 'phone', 'role', 'status')
-            ->where('status', 1)
+        // Query Builder
+        // $list = DB::table('users')
+        //     ->select('user_id', 'username', 'email', 'phone', 'role', 'status')
+        //     ->where('status', 1)
+        //     ->orderBy('username')
+        //     ->get();
+
+        // ==== ORM Eloquent ====
+        $list = User::select('user_id', 'username', 'email', 'phone', 'role', 'status')
             ->orderBy('username')
-            ->get();
+            ->paginate($limit);
         return view('admin.users.index', compact('list'));
     }
     /**

@@ -17,23 +17,25 @@
                 <th>STT</th>
                 <th>Hình ảnh</th>
                 <th>Tên sản phẩm</th>
+                <th>Loại</th>
+                <th>Thương Hiệu</th>
                 <th>Giá</th>
-                <th>Giá giảm</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($list as $item)
+            @forelse ($list as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
                         <img src="{{ asset('storage/images/products/' . ($item->image ?: 'default.png')) }}"
                             alt="{{ $item->productname }}" style="width: 50px; height: 50px; object-fit: cover;">
                     </td>
                     <td>{{ $item->productname }}</td>
-                    <td>{{ number_format($item->price, 0, ',', '.') }}</td>
-                    <td>{{ number_format($item->pricediscount, 0, ',', '.') }}</td>
+                    <td>{{ $item->category->catename }}</td>
+                    <td>{{ $item->brand->brandname }}</td>
+                    <td>{{ number_format($item->price, 0, ',', '.') }} đ</td>
                     <td>
                         @if ($item->status == 1)
                             <span class="badge bg-success">Hiển thị</span>
@@ -42,18 +44,26 @@
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('admin.products.destroy', $item->id) }}" method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                Xóa
-                            </button>
-                        </form>
+                        <a href="{{ route('admin.products.edit', $item->id) }}"class="btn btn-warning btn-sm">
+                            <i class = "bi bi-pencil-square"></i>
+                        </a>
+                        <a href="{{ route('admin.products.destroy', $item->id) }}"class="btn btn-danger btn-sm"
+                            onclick="return confirm('Bạn có chắc muốn xóa?')">
+                            <i class = "bi bi-trash"></i>
+                        </a>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center">
+                        Không có dữ liệu
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
+    {{-- Hiển thị phân trang --}}
+    <div class="d-flex justify-content-center">
+        {{ $list->links() }}
+    </div>
 @endsection

@@ -4,22 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Brand extends Model
 {
     // chỉ định tên bảng trong database
-    // (có thể bỏ qua khai báo $table nếu đặt theo nguyên tắc số nhiều )
-    protected $table = 'Users';
+    // (có thể bỏ qua khai báo $table nếu đặt theo nguyên tắc số nhiều)
 
+    protected $table = 'brands';
     // chỉ định tên cột khóa chính
     // có thể bỏ qua khai báo $primaryKey nếu primary key có tên 'id'
-    protected $primaryKey = 'User_id';
+    protected $primaryKey = 'brand_id';
 
     // các cột cho phép thêm/sửa dữ liệu hàng loạt
     protected $fillable = [
-        'username',
-        'email',
-        'phone',
-        'role',
+        'brandname',
+        'slug',
+        'description',
+        'image',
         'status'
     ];
 }

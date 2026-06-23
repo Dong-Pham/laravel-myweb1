@@ -15,20 +15,18 @@
         <thead class='table-dark'>
             <tr>
                 <th>STT</th>
-                <th>User_ID</th>
                 <th>Username</th>
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Vai trò</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($list as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->user_id }}</td>
+                    <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>{{ $item->username }}</td>
                     <td>{{ $item->email }}</td>
                     <td>{{ $item->phone }}</td>
@@ -47,18 +45,18 @@
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('admin.users.destroy', $item->user_id) }}" method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?')">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                Xóa
-                            </button>
+                        <a href="{{ route('admin.users.destroy', $item->user_id) }}"class="btn btn-danger btn-sm"
+                            onclick="return confirm('Bạn có chắc muốn xóa?')">
+                            <i class = "bi bi-trash"></i>
+                        </a>
                         </form>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    {{-- Hiển thị phân trang --}}
+    <div class="d-flex justify-content-center">
+        {{ $list->links() }}
+    </div>
 @endsection

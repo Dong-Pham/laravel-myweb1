@@ -5,19 +5,26 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Brand;
 
 class BrandController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($limit = 10)
     {
-        $list = DB::table('brands')
-            ->select('brand_id', 'brandname', 'slug', 'image', 'status')
-            ->where('status', 1)
+        // Query Builder
+        // $list = DB::table('brands')
+        //     ->select('brand_id', 'brandname', 'slug', 'image', 'status')
+        //     ->where('status', 1)
+        //     ->orderBy('brandname')
+        //     ->get();
+
+        // ==== ORM Eloquent ====
+        $list = Brand::select('brand_id', 'brandname', 'slug', 'image', 'status')
             ->orderBy('brandname')
-            ->get();
+            ->paginate($limit);
         return view('admin.brands.index', compact('list'));
     }
 

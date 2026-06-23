@@ -16,11 +16,10 @@
             <tr>
                 <th>STT</th>
                 <th>Hình ảnh</th>
-                <th>Mã thương hiệu</th>
                 <th>Tên thương hiệu</th>
                 <th>Slug</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
@@ -31,7 +30,6 @@
                         <img src="{{ asset('storage/images/brands/' . ($item->image ?: 'default.png')) }}"
                             alt="{{ $item->brandname }}" style="width: 50px; height: 50px; object-fit: cover;">
                     </td>
-                    <td>{{ $item->brand_id }}</td>
                     <td>{{ $item->brandname }}</td>
                     <td>{{ $item->slug }}</td>
                     <td>
@@ -42,18 +40,17 @@
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('admin.brands.destroy', $item->brand_id) }}" method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa thương hiệu này?')">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                Xóa
-                            </button>
-                        </form>
+                        <a href="{{ route('admin.brands.destroy', $item->brand_id) }}"class="btn btn-danger btn-sm"
+                            onclick="return confirm('Bạn có chắc muốn xóa?')">
+                            <i class = "bi bi-trash"></i>
+                        </a>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    {{-- Hiển thị phân trang --}}
+    <div class="d-flex justify-content-center">
+        {{ $list->links() }}
+    </div>
 @endsection

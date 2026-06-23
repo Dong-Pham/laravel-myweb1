@@ -20,22 +20,20 @@
             <tr>
                 <th>STT</th>
                 <th>Hình ảnh</th>
-                <th>Mã loại</th>
                 <th>Tên loại</th>
                 <th>Slug</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($list as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
                         <img src="{{ asset('storage/images/categories/' . ($item->image ?: 'default.png')) }}"
                             alt="{{ $item->catename }}" style="width: 50px; height: 50px; object-fit: cover;">
                     </td>
-                    <td>{{ $item->cateid }}</td>
                     <td>{{ $item->catename }}</td>
                     <td>{{ $item->slug }}</td>
                     <td>
@@ -48,20 +46,14 @@
                     <td class="text-center">
                         <div class="d-flex justify-content gap-2">
 
-                            <a href="{{ route('admin.categories.edit', $item->cateid) }}"
-                                class="btn btn-sm btn-outline-primary">
-                                Sửa
+                            <a href="{{ route('admin.categories.edit', $item->cateid) }}"class="btn btn-warning btn-sm">
+                                <i class = "bi bi-pencil-square"></i>
                             </a>
 
-                            <form action="{{ route('admin.categories.destroy', $item->cateid) }}" method="POST"
-                                onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?')">
-                                @csrf
-                                @method('DELETE')
-
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    Xóa
-                                </button>
-                            </form>
+                            <a href="{{ route('admin.categories.destroy', $item->cateid) }}"class="btn btn-danger btn-sm"
+                                onclick="return confirm('Bạn có chắc muốn xóa?')">
+                                <i class = "bi bi-trash"></i>
+                            </a>
 
                         </div>
                     </td>
@@ -69,4 +61,8 @@
             @endforeach
         </tbody>
     </table>
+    {{-- Hiển thị phân trang --}}
+    <div class="d-flex justify-content-center">
+        {{ $list->links() }}
+    </div>
 @endsection
