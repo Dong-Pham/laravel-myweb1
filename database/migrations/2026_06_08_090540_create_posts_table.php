@@ -15,8 +15,8 @@ return new class extends Migration
             $table->increments('post_id');
             $table->string('title', 200);
             $table->string('slug', 255)->unique();
-            $table->text('content');
-            $table->string('image', 200);
+            $table->text('content')->nullable();
+            $table->string('image', 255)->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
 

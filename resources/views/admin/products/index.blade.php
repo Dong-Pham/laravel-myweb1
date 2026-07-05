@@ -10,7 +10,16 @@
 {{-- (tương ứng với @yield('content') trong layout) --}}
 @section('content')
     <h2 class="mb-3">Danh Sách Sản Phẩm</h2>
-
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('admin.products.create') }}" class="btn btn-success mb-3">
+            + Thêm mới
+        </a>
+    </div>
+    @if (@session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
     <table class ="table table-bordered table-hover table-striped">
         <thead class='table-dark'>
             <tr>

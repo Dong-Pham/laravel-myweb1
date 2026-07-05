@@ -15,6 +15,11 @@
             + Thêm mới
         </a>
     </div>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
     <table class ="table table-bordered table-hover table-striped">
         <thead class='table-dark'>
             <tr>
@@ -23,7 +28,7 @@
                 <th>Tên loại</th>
                 <th>Slug</th>
                 <th>Trạng thái</th>
-                <th>Thao tác</th>
+                <th width="120">Thao tác</th>
             </tr>
         </thead>
         <tbody>

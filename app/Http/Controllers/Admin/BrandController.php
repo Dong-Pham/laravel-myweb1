@@ -33,7 +33,9 @@ class BrandController extends Controller
      */
     public function create()
     {
-        return "Tạo thương hiệu mới";
+        $brands = Brand::select('brand_id', 'brandname')->get();
+
+        return view('admin.brands.create', compact('brands'));
     }
 
     /**
@@ -41,7 +43,22 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        return "Lưu thương hiệu mới";
+        try {
+            Brand::create([
+                'brandname' => $request->brandname,
+                'slug' => $request->slug,
+                'status' => $request->status,
+                'sort_order' => $request->sort_order ?? 0,
+                'description' => $request->description
+            ]);
+            return redirect()
+                ->route('admin.brands.index')
+                ->with('success', 'Thêm thương hiệu thành công');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -57,7 +74,8 @@ class BrandController extends Controller
      */
     public function edit(string $id)
     {
-        return "Chỉnh sửa thương hiệu có id: " . $id;
+        $brand = Brand::find($id);
+        return view('admin.brands.edit', compact('brand'));
     }
 
     /**
@@ -65,7 +83,30 @@ class BrandController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        return "Cập nhật thương hiệu có id: " . $id;
+        try {
+            $brand = Brand::find($id);
+
+            if (!$brand) {
+                return redirect()
+                    ->route('admin.brands.index')
+                    ->with('error', 'Thương hiệu không tồn tại');
+            }
+            // Thực hiện cập nhật thương hiệu
+            $brand->update([
+                'brandname' => $request->brandname,
+                'slug' => $request->slug,
+                'status' => $request->status,
+                'sort_order' => $request->sort_order ?? 0,
+                'description' => $request->description
+            ]);
+            return redirect()
+                ->route('admin.brands.index')
+                ->with('success', 'Cập nhật thương hiệu thành công');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**

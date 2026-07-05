@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
+use App\Models\Category;
+use App\Models\Brand;
 
 class ProductController extends Controller
 {
@@ -57,7 +59,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return "Tạo sản phẩm mới";
+        $categories = Category::select('cateid', 'catename')->get();
+        $brands = Brand::select('brand_id', 'brandname')->get();
+        return view('admin.products.create', compact('categories', 'brands'));
     }
 
     /**
@@ -65,7 +69,24 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        return "Lưu sản phẩm mới";
+        try {
+            Product::create([
+                'productname' => $request->productname,
+                'slug' => $request->slug,
+                'cateid' => $request->cateid,
+                'brand_id' => $request->brand_id,
+                'price' => $request->price,
+                'pricediscount' => $request->pricediscount ?? 0,
+                'status' => $request->status,
+            ]);
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'Thêm sản phẩm thành công');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -81,7 +102,10 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        return "Chỉnh sửa sản phẩm có id: " . $id;
+        $product = Product::find($id);
+        $categories = Category::select('cateid', 'catename')->get();
+        $brands = Brand::select('brand_id', 'brandname')->get();
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
     /**
@@ -89,7 +113,43 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        return "Cập nhật sản phẩm có id: " . $id;
+        try {
+
+            // Kiểm tra loại sản phẩm
+            if (empty($request->cateid)) {
+
+                return back()
+                    ->withInput()
+                    ->with('error', 'Vui lòng chọn loại sản phẩm');
+            }
+
+            $product = Product::find($id);
+
+            if (!$product) {
+                return redirect()
+                    ->route('admin.products.index')
+                    ->with('error', 'Sản phẩm không tồn tại');
+            }
+            // Thực hiện cập nhật sản phẩm
+            $product->update([
+                'productname' => $request->productname,
+                'cateid' => $request->cateid,
+                'brand_id' => $request->brand_id,
+                'price' => $request->price,
+                'pricediscount' => $request->pricediscount,
+                'status' => $request->status,
+                'description' => $request->description
+            ]);
+
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'Cập nhật sản phẩm thành công');
+        } catch (\Exception $e) {
+
+            return back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**

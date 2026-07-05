@@ -10,6 +10,16 @@
 {{-- (tương ứng với @yield('content') trong layout) --}}
 @section('content')
     <h2 class="mb-3">Danh Sách Bài Viết</h2>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('admin.posts.create') }}" class="btn btn-success mb-3">
+            + Thêm mới
+        </a>
+    </div>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <table class ="table table-bordered table-hover table-striped">
         <thead class='table-dark'>
@@ -21,7 +31,7 @@
                 <th>Nội dung</th>
                 <th>Người viết</th>
                 <th>Trạng thái</th>
-                <th>Thao tác</th>
+                <th width="120">Thao tác</th>
             </tr>
         </thead>
         <tbody>
@@ -44,6 +54,9 @@
                         @endif
                     </td>
                     <td>
+                        <a href="{{ route('admin.posts.edit', $item->post_id) }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
                         <a href="{{ route('admin.posts.destroy', $item->post_id) }}"class="btn btn-danger btn-sm"
                             onclick="return confirm('Bạn có chắc muốn xóa?')">
                             <i class = "bi bi-trash"></i>

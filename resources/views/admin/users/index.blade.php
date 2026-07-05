@@ -10,6 +10,16 @@
 {{-- (tương ứng với @yield('content') trong layout) --}}
 @section('content')
     <h2 class="mb-3">Danh Sách Người Dùng</h2>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('admin.users.create') }}" class="btn btn-success mb-3">
+            + Thêm mới
+        </a>
+    </div>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <table class ="table table-bordered table-hover table-striped">
         <thead class='table-dark'>
@@ -32,9 +42,9 @@
                     <td>{{ $item->phone }}</td>
                     <td>
                         @if ($item->role == 1)
-                            <span class="badge bg-secondary">Quản trị viên</span>
+                            <span class="badge bg-secondary">Quản lý</span>
                         @else
-                            <span class="badge bg-info">Người dùng</span>
+                            <span class="badge bg-info">Nhân viên</span>
                         @endif
                     </td>
                     <td>
@@ -45,6 +55,9 @@
                         @endif
                     </td>
                     <td>
+                        <a href="{{ route('admin.users.edit', $item->user_id) }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
                         <a href="{{ route('admin.users.destroy', $item->user_id) }}"class="btn btn-danger btn-sm"
                             onclick="return confirm('Bạn có chắc muốn xóa?')">
                             <i class = "bi bi-trash"></i>

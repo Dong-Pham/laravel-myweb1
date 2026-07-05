@@ -11,21 +11,31 @@
 @section('content')
     <h2 class="mb-3">Danh Sách Thương Hiệu</h2>
 
-    <table class ="table table-bordered table-hover table-striped">
-        <thead class='table-dark'>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('admin.brands.create') }}" class="btn btn-success mb-3">
+            + Thêm mới
+        </a>
+    </div>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+    <table class="table table-bordered table-hover">
+        <thead>
             <tr>
                 <th>STT</th>
                 <th>Hình ảnh</th>
                 <th>Tên thương hiệu</th>
                 <th>Slug</th>
                 <th>Trạng thái</th>
-                <th>Thao tác</th>
+                <th width="120">Thao tác</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($list as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
                         <img src="{{ asset('storage/images/brands/' . ($item->image ?: 'default.png')) }}"
                             alt="{{ $item->brandname }}" style="width: 50px; height: 50px; object-fit: cover;">
@@ -40,6 +50,9 @@
                         @endif
                     </td>
                     <td>
+                        <a href="{{ route('admin.brands.edit', $item->brand_id) }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
                         <a href="{{ route('admin.brands.destroy', $item->brand_id) }}"class="btn btn-danger btn-sm"
                             onclick="return confirm('Bạn có chắc muốn xóa?')">
                             <i class = "bi bi-trash"></i>
