@@ -11,12 +11,10 @@
 @section('content')
     <div class="border rounded bg-white p-4  shadow-sm">
         <h3 class= "mb-4">Cập nhật sản phẩm</h3>
-        {{-- Hiển thị lỗi từ session flash --}}
-        @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
+
+        {{-- gọi component --}}
+        <x-admin.alert />
+
         <form action="{{ route('admin.products.update', $product->id) }}" method="POST">
             @csrf
             @method('PUT')
@@ -26,6 +24,11 @@
                         <label class="form-label">Tên sản phẩm</label>
                         <input type="text" name="productname" class="form-control"
                             value="{{ old('productname', $product->productname) }}" required>
+                        @error('productname')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="mb-3">
@@ -44,6 +47,11 @@
                             </option>
                         @endforeach
                     </select>
+                    @error('cateid')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Thương hiệu</label>
@@ -56,6 +64,11 @@
                             </option>
                         @endforeach
                     </select>
+                    @error('brand_id')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
             </div>
             <div class="col-md-6">
@@ -63,11 +76,21 @@
                     <label class="form-label">Giá</label>
                     <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}"
                         required>
+                    @error('price')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Giá khuyến mãi</label>
                     <input type="number" name="pricediscount" class="form-control"
                         value="{{ old('pricediscount', $product->pricediscount) }}">
+                    @error('pricediscount')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label d-block">Trạng thái</label>
@@ -81,21 +104,28 @@
                     <label class="btn btn-outline-danger" for="inactive">
                         Ẩn
                     </label>
+                    @error('status')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Mô tả sản phẩm</label>
                     <textarea name="description" rows="4" class="form-control">{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
             </div>
-            <button type="submit" class="btn btn_primary">
+            <button type="submit" class="btn btn-primary">
                 Lưu sản phẩm
             </button>
             <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
                 Quay lại
             </a>
-    </div>
-
-
-    </form>
+        </form>
     </div>
 @endsection

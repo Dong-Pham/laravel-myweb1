@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProductRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
@@ -67,7 +68,7 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
         try {
             Product::create([
@@ -102,7 +103,7 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        $product = Product::find($id);
+        $product = Product::findOrfail($id);
         $categories = Category::select('cateid', 'catename')->get();
         $brands = Brand::select('brand_id', 'brandname')->get();
         return view('admin.products.edit', compact('product', 'categories', 'brands'));
@@ -111,25 +112,11 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductRequest $request, string $id)
     {
         try {
+            $product = Product::findOrFail($id);
 
-            // Kiểm tra loại sản phẩm
-            if (empty($request->cateid)) {
-
-                return back()
-                    ->withInput()
-                    ->with('error', 'Vui lòng chọn loại sản phẩm');
-            }
-
-            $product = Product::find($id);
-
-            if (!$product) {
-                return redirect()
-                    ->route('admin.products.index')
-                    ->with('error', 'Sản phẩm không tồn tại');
-            }
             // Thực hiện cập nhật sản phẩm
             $product->update([
                 'productname' => $request->productname,

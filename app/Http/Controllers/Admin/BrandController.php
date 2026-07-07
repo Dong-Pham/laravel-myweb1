@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BrandRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Brand;
@@ -41,14 +42,13 @@ class BrandController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BrandRequest $request)
     {
         try {
             Brand::create([
                 'brandname' => $request->brandname,
                 'slug' => $request->slug,
                 'status' => $request->status,
-                'sort_order' => $request->sort_order ?? 0,
                 'description' => $request->description
             ]);
             return redirect()
@@ -57,7 +57,7 @@ class BrandController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', $e->getMessage());
+                ->with('error', 'Thêm thất bại');
         }
     }
 
@@ -81,16 +81,11 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(BrandRequest $request, string $id)
     {
         try {
-            $brand = Brand::find($id);
+            $brand = Brand::findOrFail($id);
 
-            if (!$brand) {
-                return redirect()
-                    ->route('admin.brands.index')
-                    ->with('error', 'Thương hiệu không tồn tại');
-            }
             // Thực hiện cập nhật thương hiệu
             $brand->update([
                 'brandname' => $request->brandname,
@@ -105,7 +100,7 @@ class BrandController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', $e->getMessage());
+                ->with('error', 'Cập nhật thất bại');
         }
     }
 

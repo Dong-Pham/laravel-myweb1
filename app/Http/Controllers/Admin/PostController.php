@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PostRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Post;
@@ -61,7 +62,7 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
         try {
             Post::create([
@@ -103,16 +104,10 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PostRequest $request, string $id)
     {
         try {
-            $post = Post::find($id);
-
-            if (!$post) {
-                return redirect()
-                    ->route('admin.posts.index')
-                    ->with('error', 'Bài viết không tồn tại');
-            }
+            $post = Post::findOrFail($id);
 
             $post->update([
                 'title' => $request->title,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -56,6 +57,40 @@ class CategoryController extends Controller
         //     'status' => $request->status
         // ]);
         // return redirect()->route('admin.categories.index');
+
+        // Thực hiện Validation dữ liệu
+        // Tự động lưu lỗi vào $errors và chuyển về trang trước nếu Validation thất bại
+        $request->validate(
+            // Parram 1: Rules - khai báo các quy tắc kiểm tra dữ liệu
+            [
+                'catename' => 'required|min:3|max:100|unique:categories,catename',
+                'slug' => [
+                    'required',
+                    'min:5',
+                    'max:150',
+                    'unique:categories,slug',
+                    'regex:/^[a-z0-9-]+$/'
+                ],
+                'status' => 'required|in:0,1'
+            ],
+            // Parram 2: Messages - tùy chỉnh nội dung thông báo lỗi.
+            [
+                'required' => ':attribute không được để trống.',
+                'min' => ':attribute phải từ :min ký tự trở lên.',
+                'max' => ':attribute không vượt quá :max ký tự.',
+                'unique' => ':attribute đã tồn tại.',
+                'slug.regex' => ':attribute chỉ được chứa chữ thường, số và dấu gạch ngang (-).',
+                'status.in' => ':attribute không hợp lệ.'
+            ],
+            // Parram 3: Attributes- tên hiển thị của các trường
+            [
+                'catename' => 'Tên loại',
+                'slug' => 'Đường dẫn (Slug)',
+                'status' => 'Trạng thái'
+            ]
+        );
+        // thêm dữ liệu ... try/catch
+
         try {
             Category::create([
                 'catename' => $request->catename,
@@ -72,6 +107,7 @@ class CategoryController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -105,15 +141,41 @@ class CategoryController extends Controller
         //     ]);
         // return redirect()->route('admin.categories.index');
 
-        try {
-            $category = Category::find($id);
+        // Validate dữ liệu
+        $request->validate(
+            // Param 1: Rules - khai báo các quy tắc kiểm tra dữ liệu
+            [
+                'catename' => 'required|min:3|max:100|unique:categories,catename,' . $id . ',cateid',
+                'slug' => [
+                    'required',
+                    'min:5',
+                    'max:150',
+                    'regex:/^[a-z0-9-]+$/',
+                    Rule::unique('categories', 'slug')->ignore($id, 'cateid'),
+                ],
+                'status' => 'required|in:0,1'
+            ],
+            // Param 2: Messages - tùy chỉnh nội dung thông báo lỗi
+            [
+                'required' => ':attribute không được để trống.',
+                'min' => ':attribute phải từ :min ký tự trở lên.',
+                'max' => ':attribute không vượt quá :max ký tự.',
+                'unique' => ':attribute đã tồn tại.',
+                'slug.regex' => ':attribute chỉ được chứa chữ thường, số và dấu gạch ngang (-).',
+                'status.in' => ':attribute không hợp lệ.'
+            ],
+            // Param 3: Attributes - tên hiển thị của các trường
+            [
+                'catename' => 'Tên loại',
+                'slug' => 'Đường dẫn (Slug)',
+                'status' => 'Trạng thái'
+            ]
+        );
 
-            if (!$category) {
-                return redirect()
-                    ->route('admin.categories.index')
-                    ->with('error', 'Danh mục không tồn tại');
-            }
-            // Thực hiện cập nhật danh mục
+        try {
+            // Tìm category theo id
+            $category = Category::findOrFail($id);
+            // Cập nhật dữ liệu
             $category->update([
                 'catename' => $request->catename,
                 'slug' => $request->slug,
@@ -126,7 +188,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', $e->getMessage());
+                ->with('error', 'Cập nhật thất bại');
         }
     }
 

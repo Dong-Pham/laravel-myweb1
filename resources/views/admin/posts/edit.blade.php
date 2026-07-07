@@ -4,12 +4,8 @@
 @section('content')
     <div class="border rounded bg-white p-4 shadow-sm">
         <h3 class="mb-4">Chỉnh sửa bài viết</h3>
-        {{-- Hiển thị lỗi từ session flash --}}
-        @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
+        {{-- gọi component --}}
+        <x-admin.alert />
 
         <form action="{{ route('admin.posts.update', $post->post_id) }}" method="POST" enctype="multipart/form-data">
             @method('PUT')
@@ -20,11 +16,21 @@
                         <label class="form-label">Tiêu đề bài viết</label>
                         <input type="text" name="title" class="form-control" value="{{ old('title', $post->title) }}"
                             required>
+                        @error('title')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Slug</label>
                         <input type="text" name="slug" class="form-control" value="{{ old('slug', $post->slug) }}"
                             required>
+                        @error('slug')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Trạng thái</label>
@@ -38,6 +44,11 @@
                         <label class="btn btn-outline-danger" for="inactive">
                             Ẩn
                         </label>
+                        @error('status')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Người viết</label>
@@ -50,17 +61,27 @@
                                 </option>
                             @endforeach
                         </select>
+                        @error('user_id')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Nội dung</label>
                         <textarea name="content" rows="10" class="form-control" required>{{ old('content', $post->content) }}</textarea>
+                        @error('content')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn_primary">
-                Lưu sản phẩm
+            <button type="submit" class="btn btn-primary">
+                Lưu bài viết
             </button>
             <a href="{{ route('admin.posts.index') }}" class="btn btn-secondary">
                 Quay lại
