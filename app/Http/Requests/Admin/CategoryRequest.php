@@ -6,7 +6,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class BrandRequest extends FormRequest
+
+class CategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,20 +24,20 @@ class BrandRequest extends FormRequest
      */
     public function rules(): array
     {
-        // lấy model Brand từ tham số brand từ URL hiện tại (Resource Route)
-        $brand = $this->route('brand');
+        // lấy model Category từ tham số category từ URL hiện tại (Resource Route)
+        $category = $this->route('category');
         return [
-            'brandname' => [
+            'catename' => [
                 'required',
                 'min:3',
                 'max:100',
-                Rule::unique('brands', 'brandname')->ignore($brand, 'brand_id'),
+                Rule::unique('categories', 'catename')->ignore($category, 'cateid'),
             ],
             'slug' => [
                 'required',
-                'min:3',
+                'min:5',
                 'max:150',
-                Rule::unique('brands', 'slug')->ignore($brand, 'brand_id'),
+                Rule::unique('categories', 'slug')->ignore($category, 'cateid'),
                 'regex:/^[a-z0-9-]+$/',
             ],
             'img' => [
@@ -45,7 +46,7 @@ class BrandRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:200',
             ],
-            'status' => 'required|in:0,1',
+            'status' => 'required|in:0,1'
         ];
     }
 
@@ -69,10 +70,11 @@ class BrandRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'brandname' => 'Tên thương hiệu',
+            'catename' => 'Tên loại',
             'slug' => 'Đường dẫn (Slug)',
             'image' => 'Hình ảnh',
-            'status' => 'Trạng thái',
+            'status' => 'Trạng thái'
+
         ];
     }
 }

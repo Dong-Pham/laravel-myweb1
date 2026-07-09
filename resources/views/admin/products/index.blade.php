@@ -29,6 +29,7 @@
                 <th>Loại</th>
                 <th>Thương Hiệu</th>
                 <th>Giá</th>
+                <th>Giá khuyến mãi</th>
                 <th>Trạng thái</th>
                 <th>Thao tác</th>
             </tr>
@@ -38,13 +39,15 @@
                 <tr>
                     <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
-                        <img src="{{ asset('storage/images/products/' . ($item->image ?: 'default.png')) }}"
-                            alt="{{ $item->productname }}" style="width: 50px; height: 50px; object-fit: cover;">
+                        @if ($item->image)
+                            <img src="{{ asset('storage/products/' . $item->image) }}" width="80" class="img-thumbnail">
+                        @endif
                     </td>
                     <td>{{ $item->productname }}</td>
                     <td>{{ $item->category->catename }}</td>
                     <td>{{ $item->brand->brandname }}</td>
                     <td>{{ number_format($item->price, 0, ',', '.') }} đ</td>
+                    <td>{{ number_format($item->pricediscount, 0, ',', '.') }} đ</td>
                     <td>
                         @if ($item->status == 1)
                             <span class="badge bg-success">Hiển thị</span>

@@ -15,7 +15,7 @@
         {{-- gọi component --}}
         <x-admin.alert />
 
-        <form action="{{ route('admin.categories.update', $category->cateid) }}" method="POST">
+        <form action="{{ route('admin.categories.update', $category->cateid) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-3">
@@ -39,6 +39,22 @@
                 @enderror
             </div>
 
+            <div class="mb-3 img-group">
+                <label class="form-label">Hình ảnh loại sản phẩm</label>
+                <input type="file" name="img" class="form-control img-input">
+                <div class="img-preview mt-2">
+                    @if ($category->image)
+                        <img src="{{ asset('storage/categories/' . $category->image) }}" alt="{{ $category->catename }}"
+                            width="150" class="img-thumbnail">
+                    @endif
+                </div>
+                {{-- Hiển thị lỗi cho trường img --}}
+                @error('img')
+                    <span class="text-danger">
+                        {{ $message }}
+                    </span>
+                @enderror
+            </div>
             <div class="mb-3">
                 <label class="form-label">Trạng thái</label>
                 <div>

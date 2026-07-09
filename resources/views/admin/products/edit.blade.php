@@ -15,7 +15,7 @@
         {{-- gọi component --}}
         <x-admin.alert />
 
-        <form action="{{ route('admin.products.update', $product->id) }}" method="POST">
+        <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="row">
@@ -70,6 +70,45 @@
                         </span>
                     @enderror
                 </div>
+            </div>
+            <div class="mb-3 img-group">
+                <label class="form-label">Hình ảnh chính</label>
+                <input type="file" name="img" class="form-control img-input">
+                <div class="img-preview mt-2">
+                    @if ($product->image)
+                        <img src="{{ asset('storage/products/' . $product->image) }}" class="img-thumbnail" width="120">
+                    @endif
+                </div>
+                {{-- hiển thị lỗi cho trường img --}}
+                @error('img')
+                    <span class="text-danger">
+                        {{ $message }}
+                    </span>
+                @enderror
+            </div>
+
+            <div class="mb-3 img-group">
+                <label class="form-label">Hình ảnh phụ</label>
+                <input type="file" name="imgs[]" class="form-control img-input" multiple>
+                <div class="img-preview mt-2">
+                    @foreach ($product->images as $image)
+                        <div class="d-inline-block position-relative me-2 mb-2 image-item">
+                            <img src="{{ asset('storage/products/' . $image->image) }}" class="img-thumbnail me-2 mb-2"
+                                width="100">
+                            <button type="button"
+                                class="btn btn-sm btn-danger position-absolute top-0 end-0 remove-image-btn"
+                                data-product-id="{{ $product->id }}" data-image-id="{{ $image->id }}">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+                {{-- hiển thị lỗi cho trường imgs --}}
+                @error('imgs')
+                    <span class="text-danger">
+                        {{ $message }}
+                    </span>
+                @enderror
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
@@ -128,4 +167,36 @@
             </a>
         </form>
     </div>
+    <script>
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.remove-image-btn');
+            if (!btn) return;
+
+            const productId = btn.dataset.productId;
+            const imageId = btn.dataset.imageId;
+            if (!productId || !imageId) return;
+
+            if (!confirm('Bạn có chắc muốn xóa ảnh phụ này không?')) return;
+
+            fetch(`{{ url('admin/products') }}/${productId}/images/${imageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        const item = btn.closest('.image-item');
+                        if (item) item.remove();
+                    } else {
+                        alert(data.message || 'Xóa ảnh thất bại');
+                    }
+                })
+                .catch(err => {
+                    alert('Lỗi khi xóa ảnh: ' + (err.message || err));
+                });
+        });
+    </script>
 @endsection

@@ -15,7 +15,7 @@
         {{-- gọi component --}}
         <x-admin.alert />
 
-        <form action="{{ route('admin.products.store') }}" method="POST">
+        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-6">
@@ -72,6 +72,29 @@
                             </span>
                         @enderror
                     </div>
+                </div>
+                <div class="mb-3 img-group">
+                    <label class="form-label">Hình ảnh chính</label>
+                    <input type="file" name="img" class="form-control img-input">
+                    <div class="img-preview mt-2"></div>
+                    {{-- hiển thị lỗi cho trường img --}}
+                    @error('img')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
+                </div>
+
+                <div class="mb-3 img-group">
+                    <label class="form-label">Hình ảnh phụ</label>
+                    <input type="file" name="imgs[]" class="form-control img-input" multiple>
+                    <div class="img-preview mt-2"></div>
+                    {{-- hiển thị lỗi cho trường imgs --}}
+                    @error('imgs')
+                        <span class="text-danger">
+                            {{ $message }}
+                        </span>
+                    @enderror
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">

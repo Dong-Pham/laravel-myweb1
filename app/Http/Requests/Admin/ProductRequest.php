@@ -41,6 +41,25 @@ class ProductRequest extends FormRequest
                 Rule::unique('products', 'slug')->ignore($product),
                 'regex:/^[A-Za-z0-9_-]+$/',
             ],
+
+            'img' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:200',
+            ],
+            // mảng
+            'imgs' => [
+                'nullable',
+                'array',
+            ],
+            // từng phần tử trong file
+            'imgs.*' => [
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:200',
+            ],
+
             'price' => 'required|numeric|gte:0|lt:10000000',
             'pricediscount' => 'nullable|numeric|gte:0|lte:price',
             'status' => 'required|in:0,1',
@@ -61,11 +80,22 @@ class ProductRequest extends FormRequest
             'lt' => ':attribute phải nhỏ hơn :value.',
             'lte' => ':attribute không được lớn hơn :value.',
             'unique' => ':attribute đã tồn tại.',
+
             'slug.regex' => ':attribute chỉ được chứa chữ, số, dấu gạch ngang (-) và dấu gạch dưới (_).',
+
             'status.in' => ':attribute không hợp lệ.',
+
             'cateid.exists' => 'Loại sản phẩm không tồn tại.',
+
             'brand_id.exists' => 'Thương hiệu không tồn tại.',
+
             'description.regex' => ':attribute không được chứa các ký tự @, !, $, ^.',
+
+            'image' => ':attribute phải là hình ảnh.',
+            'mimes' => ':attribute chỉ chấp nhận các định dạng: jpg, jpeg, png, webp.',
+
+            'image.max' => ':attribute không được vượt quá 200 KB.',
+            'images.*.max' => ':attribute không được vượt quá 200 KB.',
         ];
     }
 
@@ -75,6 +105,8 @@ class ProductRequest extends FormRequest
             'productname' => 'Tên sản phẩm',
             'slug' => 'Đường dẫn (Slug)',
             'price' => 'Giá',
+            'imgs' => 'Hình ảnh phụ',
+            'img' => 'Hình ảnh chính',
             'pricediscount' => 'Giá khuyến mãi',
             'status' => 'Trạng thái',
             'cateid' => 'Loại sản phẩm',

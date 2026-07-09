@@ -96,7 +96,7 @@ class PostController extends Controller
      */
     public function edit(string $id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
         $users = User::select('user_id', 'fullname')->get();
         return view('admin.posts.edit', compact('post', 'users'));
     }

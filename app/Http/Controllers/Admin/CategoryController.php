@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CategoryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Category;
 use Illuminate\Validation\Rule;
+use App\Models\Category;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -42,7 +45,7 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
         // Query Builder
         // DB::table('categories')->insert([
@@ -60,43 +63,55 @@ class CategoryController extends Controller
 
         // Thực hiện Validation dữ liệu
         // Tự động lưu lỗi vào $errors và chuyển về trang trước nếu Validation thất bại
-        $request->validate(
-            // Parram 1: Rules - khai báo các quy tắc kiểm tra dữ liệu
-            [
-                'catename' => 'required|min:3|max:100|unique:categories,catename',
-                'slug' => [
-                    'required',
-                    'min:5',
-                    'max:150',
-                    'unique:categories,slug',
-                    'regex:/^[a-z0-9-]+$/'
-                ],
-                'status' => 'required|in:0,1'
-            ],
-            // Parram 2: Messages - tùy chỉnh nội dung thông báo lỗi.
-            [
-                'required' => ':attribute không được để trống.',
-                'min' => ':attribute phải từ :min ký tự trở lên.',
-                'max' => ':attribute không vượt quá :max ký tự.',
-                'unique' => ':attribute đã tồn tại.',
-                'slug.regex' => ':attribute chỉ được chứa chữ thường, số và dấu gạch ngang (-).',
-                'status.in' => ':attribute không hợp lệ.'
-            ],
-            // Parram 3: Attributes- tên hiển thị của các trường
-            [
-                'catename' => 'Tên loại',
-                'slug' => 'Đường dẫn (Slug)',
-                'status' => 'Trạng thái'
-            ]
-        );
+        // $request->validate(
+        //     // Parram 1: Rules - khai báo các quy tắc kiểm tra dữ liệu
+        //     [
+        //         'catename' => 'required|min:3|max:100|unique:categories,catename',
+        //         'slug' => [
+        //             'required',
+        //             'min:5',
+        //             'max:150',
+        //             'unique:categories,slug',
+        //             'regex:/^[a-z0-9-]+$/'
+        //         ],
+        //         'status' => 'required|in:0,1'
+        //     ],
+        //     // Parram 2: Messages - tùy chỉnh nội dung thông báo lỗi.
+        //     [
+        //         'required' => ':attribute không được để trống.',
+        //         'min' => ':attribute phải từ :min ký tự trở lên.',
+        //         'max' => ':attribute không vượt quá :max ký tự.',
+        //         'unique' => ':attribute đã tồn tại.',
+        //         'slug.regex' => ':attribute chỉ được chứa chữ thường, số và dấu gạch ngang (-).',
+        //         'status.in' => ':attribute không hợp lệ.'
+        //     ],
+        //     // Parram 3: Attributes- tên hiển thị của các trường
+        //     [
+        //         'catename' => 'Tên loại',
+        //         'slug' => 'Đường dẫn (Slug)',
+        //         'status' => 'Trạng thái'
+        //     ]
+        // );
         // thêm dữ liệu ... try/catch
 
         try {
+            // upload hình ảnh (nếu có)
+            $fileName = null;
+            if ($request->hasFile('img')) {
+                $file = $request->file('img');
+                $fileName = Str::slug($request->catename)
+                    . '-' . time()
+                    . '.' . $file->extension();
+                // hình ảnh được lưu vào thư mục storage/app/public/categories
+                $file->storeAs('categories', $fileName, 'public');
+            }
+            // Thực hiện thêm dữ liệu
             Category::create([
                 'catename' => $request->catename,
                 'slug' => $request->slug,
                 'status' => $request->status,
-                'description' => $request->description
+                'description' => $request->description,
+                'image' => $fileName
             ]);
             return redirect()
                 ->route('admin.categories.index')
@@ -124,14 +139,14 @@ class CategoryController extends Controller
     {
         // $category = DB::table('categories')->where('cateid', $id)->first();
         // return view('admin.categories.edit', compact('category'));
-        $category = Category::find($id);
+        $category = Category::findOrFail($id);
         return view('admin.categories.edit', compact('category'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CategoryRequest $request, string $id)
     {
         // DB::table('categories')
         //     ->where('cateid', $id)
@@ -142,45 +157,63 @@ class CategoryController extends Controller
         // return redirect()->route('admin.categories.index');
 
         // Validate dữ liệu
-        $request->validate(
-            // Param 1: Rules - khai báo các quy tắc kiểm tra dữ liệu
-            [
-                'catename' => 'required|min:3|max:100|unique:categories,catename,' . $id . ',cateid',
-                'slug' => [
-                    'required',
-                    'min:5',
-                    'max:150',
-                    'regex:/^[a-z0-9-]+$/',
-                    Rule::unique('categories', 'slug')->ignore($id, 'cateid'),
-                ],
-                'status' => 'required|in:0,1'
-            ],
-            // Param 2: Messages - tùy chỉnh nội dung thông báo lỗi
-            [
-                'required' => ':attribute không được để trống.',
-                'min' => ':attribute phải từ :min ký tự trở lên.',
-                'max' => ':attribute không vượt quá :max ký tự.',
-                'unique' => ':attribute đã tồn tại.',
-                'slug.regex' => ':attribute chỉ được chứa chữ thường, số và dấu gạch ngang (-).',
-                'status.in' => ':attribute không hợp lệ.'
-            ],
-            // Param 3: Attributes - tên hiển thị của các trường
-            [
-                'catename' => 'Tên loại',
-                'slug' => 'Đường dẫn (Slug)',
-                'status' => 'Trạng thái'
-            ]
-        );
+        // $request->validate(
+        //     // Param 1: Rules - khai báo các quy tắc kiểm tra dữ liệu
+        //     [
+        //         'catename' => 'required|min:3|max:100|unique:categories,catename,' . $id . ',cateid',
+        //         'slug' => [
+        //             'required',
+        //             'min:5',
+        //             'max:150',
+        //             'regex:/^[a-z0-9-]+$/',
+        //             Rule::unique('categories', 'slug')->ignore($id, 'cateid'),
+        //         ],
+        //         'status' => 'required|in:0,1'
+        //     ],
+        //     // Param 2: Messages - tùy chỉnh nội dung thông báo lỗi
+        //     [
+        //         'required' => ':attribute không được để trống.',
+        //         'min' => ':attribute phải từ :min ký tự trở lên.',
+        //         'max' => ':attribute không vượt quá :max ký tự.',
+        //         'unique' => ':attribute đã tồn tại.',
+        //         'slug.regex' => ':attribute chỉ được chứa chữ thường, số và dấu gạch ngang (-).',
+        //         'status.in' => ':attribute không hợp lệ.'
+        //     ],
+        //     // Param 3: Attributes - tên hiển thị của các trường
+        //     [
+        //         'catename' => 'Tên loại',
+        //         'slug' => 'Đường dẫn (Slug)',
+        //         'status' => 'Trạng thái'
+        //     ]
+        // );
 
         try {
             // Tìm category theo id
             $category = Category::findOrFail($id);
+
+            // Có chọn hình ảnh mới
+            // Giữ tên hình ảnh cũ
+            $fileName = $category->image;
+            if ($request->hasFile('img')) {
+                // Xóa hình ảnh cũ
+                if ($fileName) {
+                    Storage::disk('public')->delete('categories/' . $category->image);
+                }
+                // Upload hình ảnh mới
+                $file = $request->file('img');
+                $fileName = Str::slug($request->catename)
+
+                    . '-' . time()
+                    . '.' . $file->extension();
+                $file->storeAs('categories', $fileName, 'public');
+            }
             // Cập nhật dữ liệu
             $category->update([
                 'catename' => $request->catename,
                 'slug' => $request->slug,
                 'status' => $request->status,
-                'description' => $request->description
+                'description' => $request->description,
+                'image' => $fileName
             ]);
             return redirect()
                 ->route('admin.categories.index')

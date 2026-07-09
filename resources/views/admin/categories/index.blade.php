@@ -36,8 +36,9 @@
                 <tr>
                     <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
-                        <img src="{{ asset('storage/images/categories/' . ($item->image ?: 'default.png')) }}"
-                            alt="{{ $item->catename }}" style="width: 50px; height: 50px; object-fit: cover;">
+                        @if ($item->image)
+                            <img src="{{ asset('storage/categories/' . $item->image) }}" width="80" class="img-thumbnail">
+                        @endif
                     </td>
                     <td>{{ $item->catename }}</td>
                     <td>{{ $item->slug }}</td>

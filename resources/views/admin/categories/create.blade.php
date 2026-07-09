@@ -15,7 +15,7 @@
         {{-- gọi component --}}
         <x-admin.alert />
 
-        <form action="{{ route('admin.categories.store') }}" method="POST">
+        <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label>Tên loại sản phẩm</label>
@@ -32,6 +32,17 @@
                 <input type="text" name="slug" class="form-control" value="{{ old('slug') }}" required>
                 {{-- hiển thị lỗi cho trường slug --}}
                 @error('slug')
+                    <span class="text-danger">
+                        {{ $message }}
+                    </span>
+                @enderror
+            </div>
+            <div class="mb-3 img-group">
+                <label>Hình ảnh loại sản phẩm</label>
+                <input type="file" name="img" class="form-control img-input">
+                <div class="img-preview mt-2"></div>
+                {{-- hiển thị lỗi cho trường img --}}
+                @error('img')
                     <span class="text-danger">
                         {{ $message }}
                     </span>

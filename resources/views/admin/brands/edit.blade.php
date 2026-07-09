@@ -9,7 +9,7 @@
         {{-- gọi component --}}
         <x-admin.alert />
 
-        <form action="{{ route('admin.brands.update', $brand->brand_id) }}" method="POST">
+        <form action="{{ route('admin.brands.update', $brand->brand_id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -27,6 +27,23 @@
                 <label>Slug</label>
                 <input type="text" name="slug" class="form-control" value="{{ old('slug', $brand->slug) }}">
                 @error('slug')
+                    <span class="text-danger">
+                        {{ $message }}
+                    </span>
+                @enderror
+            </div>
+
+            <div class="mb-3 img-group">
+                <label class="form-label">Logo thương hiệu</label>
+                <input type="file" name="img" class="form-control img-input">
+                <div class="img-preview mt-2">
+                    @if ($brand->image)
+                        <img src="{{ asset('storage/brands/' . $brand->image) }}" alt="{{ $brand->brandname }}"
+                            width="150" class="img-thumbnail">
+                    @endif
+                </div>
+                {{-- Hiển thị lỗi cho trường img --}}
+                @error('img')
                     <span class="text-danger">
                         {{ $message }}
                     </span>
