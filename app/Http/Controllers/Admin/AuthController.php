@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+
+
+
+class AuthController extends Controller
+{
+    // Hiển thị trang đăng nhập
+    public function login(Request $request)
+    {
+        // Kiểm tra đã lưu đăng nhập chưa thì chuyển đến Dashboard
+        if (Auth::check()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return view('admin.auth.login');
+    }
+    // Xử lý đăng nhập
+    public function postLogin(Request $request)
+    {
+        // validate - kiểm tra dữ liệu đầu vào
+        // bổ sung thêm một số ràng buộc khác - nếu có
+        $request->validate(
+            [
+                'username' => 'required',
+                'password' => 'required',
+            ],
+            [
+                'required' => ':attribute không được để trống',
+            ],
+            [
+                'username' => 'Tên đăng nhập',
+                'password' => 'Mật khẩu',
+            ]
+        );
+        // first(): lấy ra record đầu tiên khi truy vấn dữ liệu
+        $user = User::where('username', $request->username)->first();
+        // Nếu không tìm thấy người dùng trong bảng users
+        if (!$user) {
+            return back()
+                ->with('error', 'Username không tồn tại')
+                ->withInput();
+        }
+        // Nếu tìm thấy người dùng thì kiểm tra mật khẩu
+        // do mật khẩu dùng Hash::make() để mã hóa, nên cần so sánh phải dùng với hàm Hash::check()
+        $check = Hash::check($request->password, $user->password); // true hoặc false
+        // trường hợp mật khẩu không khớp
+        if (!$check) {
+            // điều hướng về trước (login) với session flash 'message'
+            return back()->with('error', 'Mật khẩu không đúng')->withInput();
+        }
+        // Nếu biến $remember có giá trị true (nếu người dùng chọn nhớ tài khoản)
+        $remember = $request->has('remember') ? true : false;
+        Auth::login($user, $remember);
+        // sử dụng intended để điều hướng về URL mà người dùng muốn truy cập
+        // nếu không có thì điều hướng về dasboard (route name dashboard được khai báo trong web.php)
+        return redirect()->intended(route('admin.dashboard'));
+    }
+    // Đăng xuất
+    public function logout(Request $request)
+    {
+        // Đăng xuất user
+        Auth::logout();
+        // Xóa session hiện tại
+        $request->session()->invalidate();
+        // Tạo lại CSRF token mới
+        $request->session()->regenerateToken();
+        // Redirect về trang login
+        return redirect()->route('admin.login');
+    }
+    // Hiển thị trang đổi mật khẩu
+    public function changePassword()
+    {
+        return view('admin.auth.change-password');
+    }
+
+    // Xử lý đổi mật khẩu
+    public function postChangePassword(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ], [
+            'required' => ':attribute không được để trống',
+            'min' => ':attribute phải có ít nhất :min ký tự',
+            'confirmed' => 'Xác nhận mật khẩu không khớp',
+        ], [
+            'old_password' => 'Mật khẩu cũ',
+            'new_password' => 'Mật khẩu mới',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user || !Hash::check($request->old_password, $user->password)) {
+            return back()->with('error', 'Mật khẩu cũ không chính xác');
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('error', 'Đổi mật khẩu thành công');
+    }
+
+    // Hiển thị trang Quên mật khẩu
+    public function forgotPassword()
+    {
+        return view('admin.users.forgotpassword');
+    }
+    // Xử lý quên mật khẩu
+    public function postForgotpassword(Request $request) {}
+}

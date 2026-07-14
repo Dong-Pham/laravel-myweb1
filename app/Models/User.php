@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Model
+class User extends Authenticatable
 {
     // chỉ định tên bảng trong database
     // (có thể bỏ qua khai báo $table nếu đặt theo nguyên tắc số nhiều )
