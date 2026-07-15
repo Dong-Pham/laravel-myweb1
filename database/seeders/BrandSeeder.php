@@ -19,6 +19,7 @@ class BrandSeeder extends Seeder
             DB::table('brands')->insert([
                 'brandname' => ucfirst($name),
                 'slug' => Str::slug($name),
+                'image'       => 'brand-' . rand(1, 5) . '.jpg',
                 'status' => fake()->numberBetween(0, 1),
                 'sort_order' => $i,
                 'description' => fake()->sentence(30),

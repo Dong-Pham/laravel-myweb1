@@ -10,16 +10,18 @@
 {{-- (tương ứng với @yield('content') trong layout) --}}
 @section('content')
     <h2 class="mb-3">Danh Sách Loại Sản Phẩm</h2>
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ route('admin.categories.create') }}" class="btn btn-success mb-3">
-            + Thêm mới
+    <div class="d-flex justify-content-end mb-3 gap-2">
+        <a href="{{ route('admin.categories.trash') }}" class="btn btn-danger">
+            <i class="bi bi-trash-fill"></i> Thùng rác
+        </a>
+        <a href="{{ route('admin.categories.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Thêm mới
         </a>
     </div>
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+
+    {{-- gọi component --}}
+    <x-admin.alert />
+
     <table class ="table table-bordered table-hover table-striped">
         <thead class='table-dark'>
             <tr>
@@ -37,7 +39,8 @@
                     <td>{{ $list->firstItem() + $loop->index }}</td>
                     <td>
                         @if ($item->image)
-                            <img src="{{ asset('storage/categories/' . $item->image) }}" width="80" class="img-thumbnail">
+                            <img src="{{ asset('storage/categories/' . $item->image) }}" width="80"
+                                class="img-thumbnail">
                         @endif
                     </td>
                     <td>{{ $item->catename }}</td>
@@ -56,10 +59,14 @@
                                 <i class = "bi bi-pencil-square"></i>
                             </a>
 
-                            <a href="{{ route('admin.categories.destroy', $item->cateid) }}"class="btn btn-danger btn-sm"
-                                onclick="return confirm('Bạn có chắc muốn xóa?')">
-                                <i class = "bi bi-trash"></i>
-                            </a>
+                            <form action="{{ route('admin.categories.destroy', $item->cateid) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
 
                         </div>
                     </td>

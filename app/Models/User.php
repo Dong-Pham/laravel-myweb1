@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
+    use SoftDeletes;
     // chỉ định tên bảng trong database
     // (có thể bỏ qua khai báo $table nếu đặt theo nguyên tắc số nhiều )
     protected $table = 'users';

@@ -211,13 +211,7 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        return redirect()->route('admin.products.index')->with('success', 'Xóa sản phẩm thành công!');
-    }
+
 
     public function test1()
     {
@@ -257,6 +251,92 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
             return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        try {
+            Product::findOrFail($id)->delete();
+
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'Xóa thành công.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Thực hiện thất bại.');
+        }
+    }
+
+    // khôi phục dữ liệu đã xóa
+    public function restore($id)
+    {
+        try {
+            Product::onlyTrashed()->findOrFail($id)->restore();
+            return redirect()
+                ->route('admin.products.trash')
+                ->with('success', 'Khôi phục thành công.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Khôi phục thất bại.');
+        }
+    }
+
+    // xóa vĩnh viễn
+    public function forceDelete($id)
+    {
+        try {
+            Product::onlyTrashed()->findOrFail($id)->forceDelete();
+            return redirect()
+                ->route('admin.products.trash')
+                ->with('success', 'Xóa vĩnh viễn thành công.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Xóa thất bại.');
+        }
+    }
+
+    public function trash(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $list = Product::onlyTrashed()->orderBy('productname')->paginate($limit);
+        $trashCount = Product::onlyTrashed()->count();
+        return view('admin.products.trash', compact('list', 'trashCount'));
+    }
+
+    // khôi phục tất cả
+    public function restoreAll()
+    {
+        try {
+            Product::onlyTrashed()->restore();
+            return redirect()
+                ->route('admin.products.trash')
+                ->with('success', 'Khôi phục tất cả thành công.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Khôi phục tất cả thất bại.');
+        }
+    }
+
+    // xóa vĩnh viễn tất cả
+    public function forceDeleteAll()
+    {
+        try {
+            Product::onlyTrashed()->forceDelete();
+            return redirect()
+                ->route('admin.products.trash')
+                ->with('success', 'Xóa vĩnh viễn tất cả thành công.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Xóa vĩnh viễn tất cả thất bại.');
         }
     }
 }

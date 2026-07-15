@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
+    use SoftDeletes;
     // Có thể bỏ qua khai báo $table nếu đặt theo nguyên tắc số nhiều
     protected $table = 'posts';
     // Có thể bỏ qua khai báo $primaryKey nếu primary key có tên 'id'

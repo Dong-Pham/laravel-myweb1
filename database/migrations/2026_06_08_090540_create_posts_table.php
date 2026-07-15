@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('content')->nullable();
             $table->string('image', 255)->nullable();
             $table->tinyInteger('status')->default(1);
+            $table->softDeletes();
             $table->timestamps();
 
             // Khóa ngoại với bảng users

@@ -14,18 +14,18 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        for($i=1;$i<=10;$i++){
-            $name =fake()->unique()->word();
+        for ($i = 1; $i <= 10; $i++) {
+            $name = fake()->unique()->word();
             DB::table('categories')->insert([
-                'catename'=>ucfirst($name),
-                'slug'=>Str::slug($name),
-                'status'=>fake()->numberBetween(0, 1),
-                'sort_order'=>$i,
-                'description'=>fake()->sentence(30),
-                'created_at'=>now(),
-                'updated_at'=>now()
+                'catename' => ucfirst($name),
+                'slug' => Str::slug($name),
+                'image'       => 'category-' . rand(1, 5) . '.jpg',
+                'status' => fake()->numberBetween(0, 1),
+                'sort_order' => $i,
+                'description' => fake()->sentence(30),
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
         }
-        
     }
 }

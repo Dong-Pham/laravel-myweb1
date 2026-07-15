@@ -9,18 +9,34 @@
 {{-- Gán nội dung cho vùng section 'content' --}}
 {{-- (tương ứng với @yield('content') trong layout) --}}
 @section('content')
-    <h2 class="mb-3">Danh Sách Thương Hiệu</h2>
-
-    <div class="d-flex justify-content-end mb-3 gap-2">
-        <a href="{{ route('admin.brands.trash') }}" class="btn btn-danger">
-            <i class="bi bi-trash-fill"></i> Thùng rác
-        </a>
-        <a href="{{ route('admin.brands.create') }}" class="btn btn-success">
-            <i class="bi bi-plus-lg"></i> Thêm mới
-        </a>
-    </div>
+    <h2 class="mb-3">Danh Sách Thương Hiệu - Đang chờ xóa ({{ $trashCount }} bản ghi)</h2>
     {{-- gọi component --}}
     <x-admin.alert />
+
+    <div class="mb-3">
+        <a href="{{ route('admin.brands.index') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i>
+            Quay lại thương hiệu
+        </a>
+        @if ($trashCount > 0)
+            <form action="{{ route('admin.brands.restoreAll') }}" method="POST" class="d-inline">
+                @csrf
+                @method('PATCH')
+                <button onclick="return confirm('Khôi phục tất cả?')" class="btn btn-success">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Khôi phục tất cả
+                </button>
+            </form>
+            <form action="{{ route('admin.brands.forceDeleteAll') }}" method="POST" class="d-inline">
+                @csrf
+                @method('DELETE')
+                <button onclick="return confirm('Xóa vĩnh viễn tất cả?')" class="btn btn-danger">
+                    <i class="bi bi-trash"></i>
+                    Xóa vĩnh viễn tất cả
+                </button>
+            </form>
+        @endif
+    </div>
 
     <table class="table table-bordered table-hover">
         <thead>
@@ -52,15 +68,19 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('admin.brands.edit', $item->brand_id) }}" class="btn btn-warning btn-sm">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <form action="{{ route('admin.brands.destroy', $item->brand_id) }}" method="POST" class="d-inline"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa?')">
+                        <form action="{{ route('admin.brands.restore', $item->brand_id) }}" method="POST" class="d-inline">
+
+                            @csrf
+                            @method('PATCH')
+                            <button class="btn btn-success btn-sm">Khôi phục</button>
+                        </form>
+                        <form action="{{ route('admin.brands.forceDelete', $item->brand_id) }}" method="POST"
+                            class="d-inline">
+
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash"></i>
+                            <button onclick="return confirm('Xóa vĩnh viễn?')"class="btn btn-danger btn-sm">
+                                Xóa
                             </button>
                         </form>
                     </td>
