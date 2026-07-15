@@ -32,6 +32,22 @@
                             </span>
                         @enderror
                     </div>
+                    <div class="mb-3 img-group">
+                        <label class="form-label">Hình ảnh bài bài viết</label>
+                        <input type="file" name="img" class="form-control img-input">
+                        <div class="img-preview mt-2">
+                            @if ($post->image)
+                                <img src="{{ asset('storage/posts/' . $post->image) }}" alt="{{ $post->postname }}"
+                                    width="150" class="img-thumbnail">
+                            @endif
+                        </div>
+                        {{-- Hiển thị lỗi cho trường img --}}
+                        @error('img')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Trạng thái</label>
                         <input type="radio" class="btn-check" name="status" id="active" value="1"

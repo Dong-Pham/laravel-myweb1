@@ -1,0 +1,15 @@
+/* Custom styles for ad section */
+.ad-banner {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe9c6 100%);
+    padding: 24px 28px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    border: 1px solid #f0c36d;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ad-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+}

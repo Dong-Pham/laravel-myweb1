@@ -30,6 +30,17 @@
                             </span>
                         @enderror
                     </div>
+                    <div class="mb-3 img-group">
+                        <label>Hình ảnh bài viết</label>
+                        <input type="file" name="img" class="form-control img-input">
+                        <div class="img-preview mt-2"></div>
+                        {{-- hiển thị lỗi cho trường img --}}
+                        @error('img')
+                            <span class="text-danger">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Trạng thái</label>
                         <input type="radio" class="btn-check" name="status" id="active" value="1"

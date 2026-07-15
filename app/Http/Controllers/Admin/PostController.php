@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -65,13 +67,25 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         try {
+            // upload hình ảnh (nếu có)
+            $fileName = null;
+            if ($request->hasFile('img')) {
+                $file = $request->file('img');
+                $baseName = $request->input('slug', $request->input('title'));
+                $fileName = Str::slug($baseName)
+                    . '-' . time()
+                    . '.' . $file->extension();
+                // hình ảnh được lưu vào thư mục storage/app/public/posts
+                $file->storeAs('posts', $fileName, 'public');
+            }
+            // Thực hiện thêm dữ liệu
             Post::create([
                 'title' => $request->title,
                 'slug' => $request->slug,
                 'content' => $request->input('content'),
                 'status' => $request->status,
                 'user_id' => $request->user_id,
-                'image' => null
+                'image' => $fileName
             ]);
             return redirect()
                 ->route('admin.posts.index')
@@ -109,12 +123,29 @@ class PostController extends Controller
         try {
             $post = Post::findOrFail($id);
 
+            // Có chọn hình ảnh mới
+            // Giữ tên hình ảnh cũ
+            $fileName = $post->image;
+            if ($request->hasFile('img')) {
+                // Xóa hình ảnh cũ nếu tồn tại
+                if ($fileName) {
+                    Storage::disk('public')->delete('posts/' . $post->image);
+                }
+                // Upload hình ảnh mới
+                $file = $request->file('img');
+                $fileName = Str::slug($request->postname)
+                    . '-' . time()
+                    . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('posts', $fileName, 'public');
+            }
+
             $post->update([
                 'title' => $request->title,
                 'slug' => $request->slug,
                 'content' => $request->input('content'),
                 'status' => $request->status,
-                'user_id' => $request->user_id
+                'user_id' => $request->user_id,
+                'image' => $fileName
             ]);
 
             return redirect()
