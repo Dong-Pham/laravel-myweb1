@@ -8,6 +8,11 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 
+// Client controllers
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
+
+
 use App\Http\Controllers\DemoController;
 use Illuminate\Support\Facades\Route;
 
@@ -152,3 +157,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/forgotpass', [AuthController::class, 'postforgotPassword'])
         ->name('forgotpass.post');
 });
+
+
+// Client routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/product/{slug}', [ClientProductController::class, 'show'])->name('products.show');
+Route::get('/category/{slug}', [ClientProductController::class, 'category'])->name('products.category');
+Route::get('/brand/{slug}', [ClientProductController::class, 'brand'])->name('products.brand');
+Route::get('/search', [ClientProductController::class, 'search'])->name('products.search');
